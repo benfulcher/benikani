@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="読み物">
+<meta name="theme-color" content="#f6f1e6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1a17" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-512.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>読み物</title>
+<style>
+/* 読み物 (Yomimono): short Japanese stories built from the kanji you know on WaniKani.
+   Three screens: home (library + new story), reader (read / quiz modes), settings.
+   Single file, no build step beyond copying; data lives in localStorage on the device. */
+:root{
+  --paper:#f6f1e6; --paper-2:#efe8d8; --card:#fffdf7; --ink:#2b2621; --ink-2:#6b625a; --line:#e2d9c6;
+  --accent:#b23a2a; --accent-ink:#fff; --ok:#2f7d4f; --ok-bg:#e3f1e7; --bad:#b23a2a; --bad-bg:#f8e2de;
+  --warn:#9a6b00; --warn-bg:#fbf0cf; --ruby:#8a6d3b; --hl:#fff1c2; --shadow:0 6px 24px rgba(60,40,10,.10);
+  --f-ui:"Hiragino Sans","Hiragino Kaku Gothic ProN",-apple-system,system-ui,sans-serif;
+  --f-story:"Hiragino Mincho ProN","Hiragino Mincho Pro","Yu Mincho","Noto Serif JP",serif;
+  --story-size:26px;
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#1c1a17; --paper-2:#24211d; --card:#2a2622; --ink:#ece5d8; --ink-2:#a79d8f; --line:#3b352e;
+    --accent:#e0705d; --accent-ink:#1c1a17; --ok:#7fcf9a; --ok-bg:#1f3a2a; --bad:#f09383; --bad-bg:#4a2521;
+    --warn:#e4bf5a; --warn-bg:#3d3214; --ruby:#cdb27a; --hl:#4a3f1e; --shadow:0 6px 24px rgba(0,0,0,.35);
+  }
+}
+html{box-sizing:border-box;height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:17px;line-height:1.5;
+  -webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;touch-action:manipulation}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+a{color:var(--accent)}
+.wrap{max-width:860px;margin:0 auto;padding:12px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))}
+
+/* top bar */
+.bar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line)}
+.bar .in{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px 16px;min-height:56px}
+.bar h1{font-size:22px;margin:0;font-weight:700;letter-spacing:.02em;flex:1;display:flex;align-items:baseline;gap:10px;min-width:0}
+.bar h1 small{font-size:13px;color:var(--ink-2);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ibtn{width:44px;height:44px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:20px;background:var(--paper-2)}
+.ibtn:active{transform:scale(.96)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;background:var(--paper-2);font-weight:600;min-height:44px}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.small{padding:8px 12px;min-height:36px;font-size:15px;font-weight:600}
+.btn:disabled{opacity:.5;cursor:default}
+.btn:active:not(:disabled){transform:scale(.98)}
+.seg{display:inline-flex;background:var(--paper-2);border-radius:12px;padding:3px;gap:2px}
+.seg button{padding:8px 14px;border-radius:9px;font-weight:600;min-height:38px;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+.card h2{margin:0 0 10px;font-size:18px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.grow{flex:1;min-width:160px}
+.muted{color:var(--ink-2);font-size:14px}
+.stack{display:flex;flex-direction:column;gap:16px}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-2);font-weight:600}
+label.f > *:last-child{font-weight:400;color:var(--ink)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--paper-2);font-size:13px;font-weight:600;color:var(--ink-2)}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+
+/* library */
+.lib{list-style:none;margin:0;padding:0;display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.lib li{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.lib li:active{transform:scale(.99)}
+.lib .jt{font-family:var(--f-story);font-size:22px;line-height:1.3}
+.lib .et{color:var(--ink-2);font-size:14px}
+.lib .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:4px}
+.empty{text-align:center;color:var(--ink-2);padding:40px 10px}
+
+/* reader */
+.story{font-family:var(--f-story);font-size:var(--story-size);line-height:2.25;word-break:keep-all;line-break:strict}
+.story h2{font-size:calc(var(--story-size) * 1.25);line-height:1.6;margin:8px 0 18px;font-weight:600}
+.story h2 small{display:block;font-family:var(--f-ui);font-size:15px;color:var(--ink-2);font-weight:500;margin-top:4px}
+.story p{margin:0 0 .9em}
+.story.blocks p{margin:0}
+.story.blocks .sent{display:block;margin:0 0 14px;padding:0 0 10px;border-bottom:1px dashed var(--line)}
+.sent{border-radius:8px;transition:background .2s}
+.nb{white-space:nowrap}
+.sent.hl{background:var(--hl)}
+.tk{font:inherit;padding:0;margin:0;display:inline;color:inherit;line-height:inherit;vertical-align:baseline}
+.kj{border-radius:6px;padding:0 1px}
+.kj rt{font-family:var(--f-ui);font-size:.42em;color:var(--ruby);visibility:hidden;letter-spacing:0;line-height:1}
+.kj.show rt{visibility:visible}
+.kj.unk{text-decoration:underline dotted var(--warn);text-underline-offset:.2em}
+.quiz .kj{background:color-mix(in srgb,var(--paper-2) 60%,transparent);box-shadow:inset 0 -2px 0 var(--line)}
+.quiz .kj.ok{background:var(--ok-bg);box-shadow:inset 0 -2px 0 var(--ok)}
+.quiz .kj.bad{background:var(--bad-bg);box-shadow:inset 0 -2px 0 var(--bad)}
+.quiz .kj.cur{outline:3px solid var(--accent);outline-offset:2px}
+.quiz .kj.mq:not(.ok):not(.bad){box-shadow:inset 0 -2px 0 var(--ruby)}   /* meaning question: furigana given, dotted-gold underline */
+.quiz .kj.mq:not(.ok):not(.bad) rt{color:var(--ruby)}
+.choices.en button{font-family:var(--f-ui);font-size:18px;font-weight:600;line-height:1.3;padding:12px 10px}
+.drawer .wm{font-family:var(--f-ui);font-size:17px;color:var(--ink-2);margin-top:4px}
+kbd{font-family:var(--f-ui);font-size:11px;font-weight:700;padding:1px 6px;border-radius:5px;background:var(--paper-2);border:1px solid var(--line);margin:0 1px}
+.keys{margin-left:8px}
+@media (hover:hover) and (pointer:fine){
+  .choices button{position:relative}
+  .choices button::before{content:attr(data-n);position:absolute;top:6px;left:8px;font-family:var(--f-ui);font-size:11px;font-weight:700;color:var(--ink-2);
+    background:var(--card);border:1px solid var(--line);border-radius:5px;padding:0 5px;line-height:16px}
+}
+.enb{display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-ui);font-size:12px;font-weight:700;
+  width:1.5em;height:1.5em;border-radius:6px;background:var(--paper-2);color:var(--ink-2);vertical-align:middle;margin:0 .15em 0 .1em;line-height:1}
+.enb[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.en{font-family:var(--f-ui);font-size:16px;line-height:1.5;color:var(--ink-2);text-align:left;margin:2px 0 10px;display:block}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0 18px}
+.toolbar .sp{flex:1}
+.scorebar{display:flex;align-items:center;gap:10px;margin:12px 0}
+.scorebar .track{flex:1;height:10px;border-radius:999px;background:var(--paper-2);overflow:hidden;display:flex}
+.scorebar .ok{background:var(--ok);height:100%}
+.scorebar .bad{background:var(--bad);height:100%}
+
+/* drawer (translation / quiz choices) */
+.drawer{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);border-radius:22px 22px 0 0;
+  box-shadow:0 -10px 40px rgba(0,0,0,.18);padding:14px 20px calc(18px + env(safe-area-inset-bottom,0px));
+  transform:translateY(110%);transition:transform .22s ease}
+.drawer.open{transform:none}
+.drawer .in{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.drawer .handle{width:44px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 4px}
+.drawer .word{font-family:var(--f-story);font-size:40px;line-height:1.3;text-align:center}
+.drawer .word rt{font-family:var(--f-ui);font-size:.4em;color:var(--ruby)}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.choices button{font-family:var(--f-story);font-size:26px;padding:14px 8px;border-radius:14px;background:var(--paper-2);min-height:64px}
+.choices button.ok{background:var(--ok-bg);color:var(--ok)}
+.choices button.bad{background:var(--bad-bg);color:var(--bad)}
+.choices button:disabled{cursor:default}
+@media (max-width:480px){.choices{grid-template-columns:1fr}.choices button{font-size:24px}}
+.drawer .jp{font-family:var(--f-story);font-size:20px;line-height:1.8}
+.drawer .trans{font-size:17px}
+.drawer .foot{display:flex;justify-content:space-between;align-items:center;gap:10px}
+
+/* toast + busy */
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;z-index:30;
+  background:var(--ink);color:var(--paper);padding:12px 18px;border-radius:14px;font-size:15px;max-width:min(90vw,560px);transition:all .2s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.err{background:var(--bad);color:#fff}
+.busy{display:flex;align-items:center;gap:14px;padding:18px;border-radius:16px;background:var(--paper-2)}
+.spin{width:22px;height:22px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.summary{display:grid;gap:10px}
+.summary .big{font-size:40px;font-weight:700;line-height:1}
+.missed{display:flex;flex-wrap:wrap;gap:8px}
+.missed span{font-family:var(--f-story);font-size:22px;background:var(--bad-bg);color:var(--bad);padding:4px 10px;border-radius:10px}
+.missed span rt{font-family:var(--f-ui);font-size:.42em}
+.missed span small{font-family:var(--f-ui);font-size:13px;font-weight:600}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px;color:var(--ink-2)}
+.kv b{color:var(--ink);font-weight:600}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.9em;background:var(--paper-2);padding:1px 6px;border-radius:6px}
+</style>
+</head>
+<body>
+
+<header class="bar"><div class="in">
+  <button class="ibtn" id="back" hidden aria-label="Back">‹</button>
+  <h1 id="title">読み物 <small id="subtitle"></small></h1>
+  <button class="ibtn" id="gear" aria-label="Settings">⚙︎</button>
+</div></header>
+
+<!-- ============ HOME ============ -->
+<main class="wrap stack" id="home">
+  <section class="card" id="newcard">
+    <h2>New story</h2>
+    <div class="stack">
+      <div class="row">
+        <label class="f grow"><span>Theme (optional)</span>
+          <input id="topic" placeholder="e.g. a lost cat in Kyoto, a job interview, a haunted vending machine" autocomplete="off"></label>
+        <label class="f"><span>Length</span>
+          <div class="seg" id="lenseg" role="group" aria-label="Length">
+            <button data-v="short" aria-pressed="false">Short</button>
+            <button data-v="medium" aria-pressed="true">Medium</button>
+            <button data-v="long" aria-pressed="false">Long</button>
+          </div></label>
+      </div>
+      <div class="row">
+        <button class="btn primary" id="gen">✍️ Write me a story</button>
+        <span class="muted" id="known"></span>
+      </div>
+      <div class="busy" id="busy" hidden><div class="spin"></div><div><div id="busytxt">Writing…</div><div class="muted" id="busysub"></div></div></div>
+    </div>
+  </section>
+  <section>
+    <div class="row" style="justify-content:space-between;margin-bottom:10px">
+      <h2 style="margin:0;font-size:18px">Library</h2>
+      <span class="muted" id="libcount"></span>
+    </div>
+    <ul class="lib" id="lib"></ul>
+    <div class="empty" id="libempty" hidden>No stories yet. Set up your tokens in ⚙︎ Settings, sync WaniKani, then write one.</div>
+  </section>
+</main>
+
+<!-- ============ READER ============ -->
+<main class="wrap" id="reader" hidden>
+  <div class="toolbar">
+    <div class="seg" id="modeseg" role="group" aria-label="Mode">
+      <button data-v="read" aria-pressed="true">Read</button>
+      <button data-v="quiz" aria-pressed="false">Quiz</button>
+    </div>
+    <span class="sp"></span>
+    <span id="readtools" class="row" style="gap:8px">
+      <button class="btn small" id="allfuri" aria-pressed="false">ふりがな</button>
+      <button class="btn small" id="allen" aria-pressed="false">English</button>
+    </span>
+    <span id="quiztools" class="row" style="gap:8px" hidden>
+      <div class="seg" id="kindseg" role="group" aria-label="Question type">
+        <button data-v="mix" aria-pressed="true">Mix</button>
+        <button data-v="reading" aria-pressed="false">Readings</button>
+        <button data-v="meaning" aria-pressed="false">Meanings</button>
+      </div>
+      <button class="btn small" id="quizspeak" aria-pressed="true" aria-label="Read each answer aloud">🔊</button>
+      <button class="btn small" id="requiz">Restart</button>
+    </span>
+    <button class="btn small" id="fontdn" aria-label="Smaller text">A−</button>
+    <button class="btn small" id="fontup" aria-label="Larger text">A+</button>
+  </div>
+  <div class="scorebar" id="scorebar" hidden>
+    <span id="scoretxt" class="pill"></span>
+    <div class="track"><div class="ok" id="trok"></div><div class="bad" id="trbad"></div></div>
+  </div>
+  <article class="story" id="story"></article>
+  <section class="card" id="quizdone" hidden></section>
+  <section class="card" id="storymeta" style="margin-top:24px"></section>
+</main>
+
+<!-- ============ SETTINGS ============ -->
+<main class="wrap stack" id="settings" hidden>
+  <section class="card">
+    <h2>WaniKani</h2>
+    <div class="stack">
+      <label class="f"><span>API token (read-only is enough)</span>
+        <div class="row"><input class="grow" id="wktoken" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste your WaniKani personal access token">
+        <button class="btn small" data-reveal="wktoken">Show</button></div></label>
+      <label class="f"><span>Count a kanji as known from</span>
+        <select id="minstage">
+          <option value="1">Apprentice I (anything started)</option>
+          <option value="5" selected>Guru I</option>
+          <option value="6">Guru II</option>
+          <option value="7">Master</option>
+          <option value="8">Enlightened</option>
+          <option value="9">Burned</option>
+        </select></label>
+      <label class="f"><span>Vocabulary</span>
+        <select id="vocabmode">
+          <option value="known" selected>Prefer words I know on WaniKani (recommended)</option>
+          <option value="any">Any words, as long as the kanji are known</option>
+        </select></label>
+      <div class="row">
+        <button class="btn" id="sync">⟳ Sync WaniKani</button>
+        <span class="muted" id="syncstat"></span>
+      </div>
+    </div>
+  </section>
+  <section class="card">
+    <h2>Claude</h2>
+    <div class="stack">
+      <label class="f"><span>Anthropic API key</span>
+        <div class="row"><input class="grow" id="apikey" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…">
+        <button class="btn small" data-reveal="apikey">Show</button></div></label>
+      <label class="f"><span>Model</span>
+        <select id="model">
+          <option value="claude-opus-5-5" selected>Claude Opus 5.5 — best Japanese, slower (≈ 10–20¢ a story)</option>
+          <option value="claude-sonnet-5-5">Claude Sonnet 5.5 — quick (≈ 5–10¢)</option>
+          <option value="claude-haiku-5-5">Claude Haiku 5.5 — cheapest (≈ 1¢)</option>
+        </select></label>
+      <p class="muted" style="margin:0">Both keys stay in this browser's storage on this device. Nothing is sent anywhere except to WaniKani and Anthropic directly.</p>
+    </div>
+  </section>
+  <section class="card">
+    <h2>Data</h2>
+    <div class="row">
+      <button class="btn small" id="export">Export stories (JSON)</button>
+      <button class="btn small" id="wipe">Delete all stories</button>
+    </div>
+    <div class="kv" id="datastats" style="margin-top:12px"></div>
+  </section>
+</main>
+
+<div class="drawer" id="drawer"><div class="in" id="drawerin"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* ------------------------------------------------------------------ storage */
+const LS = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){ toast('Could not save (storage full?)', true); } },
+};
+const settings = Object.assign({ wkToken:'', apiKey:'', model:'claude-opus-5-5', minStage:5, vocabMode:'known', length:'medium', storySize:26, quizSpeak:true, quizKind:'mix' }, LS.get('settings', {}));
+let wk = LS.get('wk', null);          // { syncedAt, level, username, subjects:{id:{o,c,l,r,m}}, stages:{id:stage} }
+let stories = LS.get('stories', []);  // newest first
+const stats = LS.get('stats', {});    // kanji -> {asked, wrong}
+const hidden = LS.get('hidden', []);  // ids of bundled stories the user deleted, so they don't come back
+const saveSettings = () => LS.set('settings', settings);
+const saveStories = () => LS.set('stories', stories);
+
+/* ------------------------------------------------------------------ helpers */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const KANJI_RE = /[㐀-䶿一-鿿豈-﫿]/;
+const hasKanji = s => KANJI_RE.test(s);
+const kanjiIn = s => [...s].filter(c => KANJI_RE.test(c));
+const kataToHira = s => s.replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+const isKana = c => /[ぁ-ゟ゠-ヿ]/.test(c);
+const shuffle = a => { for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const fmtDate = iso => new Date(iso).toLocaleDateString(undefined, {day:'numeric', month:'short'});
+let toastTimer;
+function toast(msg, err){ const t=$('#toast'); t.textContent=msg; t.className='toast show'+(err?' err':''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.className='toast', err?6000:2600); }
+
+/* Split a token into ruby segments: kana shared at the start/end of surface and reading is left bare,
+   so 食べました/たべました → [食:た][べました], お金持ち/おかねもち → [お][金持:かねも][ち]. */
+function rubyParts(surface, reading){
+  if (!reading) return [{text:surface}];
+  const s=[...surface], r=[...reading], rn=r.map(kataToHira);
+  let p=0; while (p<s.length && p<r.length && isKana(s[p]) && kataToHira(s[p])===rn[p]) p++;
+  let q=0; while (q<s.length-p && q<r.length-p && isKana(s[s.length-1-q]) && kataToHira(s[s.length-1-q])===rn[r.length-1-q]) q++;
+  const mid=s.slice(p, s.length-q).join(''), midR=r.slice(p, r.length-q).join('');
+  if (!mid) return [{text:surface, ruby:reading}];
+  const out=[]; if (p) out.push({text:s.slice(0,p).join('')}); out.push({text:mid, ruby:midR}); if (q) out.push({text:s.slice(s.length-q).join('')});
+  return out;
+}
+function rubyHTML(surface, reading){ return rubyParts(surface, reading).map(p => p.ruby ? `<ruby>${esc(p.text)}<rt>${esc(p.ruby)}</rt></ruby>` : esc(p.text)).join(''); }
+
+/* A fallback wrong reading when the model gave fewer than two distractors. */
+const DAKU = {か:'が',き:'ぎ',く:'ぐ',け:'げ',こ:'ご',さ:'ざ',し:'じ',す:'ず',せ:'ぜ',そ:'ぞ',た:'だ',ち:'ぢ',つ:'づ',て:'で',と:'ど',は:'ば',ひ:'び',ふ:'ぶ',へ:'べ',ほ:'ぼ'};
+const DAKU_R = Object.fromEntries(Object.entries(DAKU).map(([a,b])=>[b,a]));
+function mutateReading(r, n){
+  const c=[...r];
+  const ops=[
+    () => { const i=c.findIndex(x=>DAKU[x]||DAKU_R[x]); if(i<0) return null; const d=[...c]; d[i]=DAKU[c[i]]||DAKU_R[c[i]]; return d.join(''); },
+    () => c.includes('っ') ? c.join('').replace('っ','') : c.length>1 ? c[0]+'っ'+c.slice(1).join('') : null,
+    () => c.includes('う') ? c.join('').replace('う','') : c.length>1 ? c[0]+'う'+c.slice(1).join('') : null,
+    () => c.includes('ん') ? c.join('').replace('ん','') : c.join('')+'ん',
+    () => c.length>1 ? c.slice(0,-1).join('')+(c[c.length-1]==='い'?'う':'い') : c.join('')+'い',
+  ];
+  return ops[n % ops.length]();
+}
+function choicesFor(tok){
+  const set=new Set(); const out=[];
+  for (const d of (tok.d||[])){ const k=kataToHira(d); if (d && k!==kataToHira(tok.r) && !set.has(k)){ set.add(k); out.push(d); } if (out.length===2) break; }
+  for (let n=0; out.length<2 && n<10; n++){ const m=mutateReading(tok.r, n); if (m && kataToHira(m)!==kataToHira(tok.r) && !set.has(kataToHira(m))){ set.add(kataToHira(m)); out.push(m); } }
+  return shuffle([tok.r, ...out]);
+}
+
+/* ------------------------------------------------------------------ WaniKani */
+const WK = 'https://api.wanikani.com/v2/';
+async function wkGet(url){
+  const res = await fetch(url, { headers:{ Authorization:'Bearer '+settings.wkToken, 'Wanikani-Revision':'20170710' } });
+  if (!res.ok) throw new Error(res.status===401 ? 'WaniKani rejected the token.' : `WaniKani error ${res.status}`);
+  return res.json();
+}
+async function wkAll(url, onPage){
+  const out=[]; let n=0;
+  while (url){ const page=await wkGet(url); out.push(...page.data); url=page.pages && page.pages.next_url; if (onPage) onPage(++n, out.length, page.total_count); }
+  return out;
+}
+async function syncWK(){
+  if (!settings.wkToken) throw new Error('Add your WaniKani token first.');
+  const stat=$('#syncstat'); const say=m=>{ if(stat) stat.textContent=m; };
+  say('Checking account…');
+  const user=(await wkGet(WK+'user')).data;
+  const levels=Array.from({length:user.level}, (_,i)=>i+1).join(',');
+  say('Loading kanji and vocabulary…');
+  const subs=await wkAll(`${WK}subjects?types=kanji,vocabulary&levels=${levels}`, (n,got,total)=>say(`Loading subjects… ${got}/${total}`));
+  say('Loading your progress…');
+  const asg=await wkAll(`${WK}assignments?subject_types=kanji,vocabulary&started=true`, (n,got,total)=>say(`Loading progress… ${got}/${total}`));
+  const subjects={};
+  for (const s of subs){ if (s.data.hidden_at) continue;
+    subjects[s.id]={ o:s.object, c:s.data.characters, l:s.data.level,
+      r:s.data.readings.filter(r=>r.accepted_answer).map(r=>r.reading),
+      m:(s.data.meanings.find(m=>m.primary)||s.data.meanings[0]||{}).meaning||'' }; }
+  const stages={}; for (const a of asg) stages[a.data.subject_id]=a.data.srs_stage;
+  wk={ syncedAt:new Date().toISOString(), level:user.level, username:user.username, subjects, stages };
+  LS.set('wk', wk);
+  say(''); renderSyncStat(); renderKnown();
+}
+function knownSets(){
+  if (!wk) return { kanji:[], vocab:[], fresh:[] };
+  const kanji=[], vocab=[], fresh=[];
+  for (const [id,st] of Object.entries(wk.stages)){
+    const s=wk.subjects[id]; if (!s || st<settings.minStage) continue;
+    if (s.o==='kanji'){ kanji.push(s.c); if (st<=6) fresh.push(s.c); }
+    else vocab.push(s.c);
+  }
+  return { kanji, vocab, fresh };
+}
+function renderSyncStat(){
+  const el=$('#syncstat'); if (!el) return;
+  if (!wk){ el.textContent='Not synced yet.'; return; }
+  const k=knownSets();
+  el.textContent=`${wk.username}, level ${wk.level} · ${k.kanji.length} kanji, ${k.vocab.length} words known · synced ${new Date(wk.syncedAt).toLocaleString()}`;
+}
+function renderKnown(){
+  const el=$('#known'); if (!wk){ el.innerHTML='<span class="pill warn">Sync WaniKani in ⚙︎ first</span>'; return; }
+  const k=knownSets(); el.innerHTML=`<span class="pill">${k.kanji.length} kanji</span> <span class="pill">${k.vocab.length} words</span> <span class="pill">level ${wk.level}</span>`;
+}
+
+/* ------------------------------------------------------------------ Claude */
+const LEN={ short:{desc:'short (about 6–8 sentences)', max:6000}, medium:{desc:'medium-length (about 12–16 sentences)', max:9000}, long:{desc:'longer (about 22–28 sentences, two or three scenes)', max:14000} };
+const PRICE={ 'claude-opus-5-5':[4,20,0.20,5], 'claude-sonnet-5-5':[2,10,0.20,2.5], 'claude-haiku-5-5':[0.10,0.50,0.01,0.125] }; // $/MTok: in, out, cache read, cache write
+const SCHEMA={ type:'object', additionalProperties:false, required:['title_jp','title_en','sentences'],
+  properties:{
+    title_jp:{type:'string'}, title_en:{type:'string'},
+    sentences:{ type:'array', items:{ type:'object', additionalProperties:false, required:['tokens','en','new_paragraph'],
+      properties:{
+        new_paragraph:{type:'boolean', description:'true if this sentence starts a new paragraph'},
+        en:{type:'string', description:'natural English translation of this sentence'},
+        tokens:{ type:'array', items:{ type:'object', additionalProperties:false,
+          required:['t','r','d','m','md'],
+          properties:{
+            t:{type:'string', description:'the token exactly as it appears in the sentence'},
+            r:{type:'string', description:'hiragana reading of the whole token if it contains kanji, else empty string'},
+            d:{type:'array', items:{type:'string'}, description:'two plausible wrong readings if the token contains kanji, else empty'},
+            m:{type:'string', description:'short English meaning of the token as used in this sentence if it contains kanji, else empty string'},
+            md:{type:'array', items:{type:'string'}, description:'two plausible wrong English meanings if the token contains kanji, else empty'} } } } } } } } };
+
+function jlptFor(level){ return level<8 ? 'JLPT N5 (very simple)' : level<20 ? 'JLPT N5–N4' : level<35 ? 'JLPT N4–N3' : level<50 ? 'JLPT N3' : 'JLPT N3–N2'; }
+function systemPrompt(k){
+  const vocabRule = settings.vocabMode==='known'
+    ? `Prefer words from the learner's known vocabulary (below). Other common words are fine when needed, but if a word's usual kanji are not all in the known list, write that word in hiragana (katakana for loanwords).`
+    : `Any vocabulary is fine, but if a word's usual kanji are not all in the known list, write that word in hiragana (katakana for loanwords).`;
+  return `You write short, natural Japanese reading passages for an adult learner who studies kanji with WaniKani (currently level ${wk.level}).
+
+Hard constraints:
+- Every kanji character in the passage, including names and the title, must come from the known-kanji list below. Never use a kanji outside the list. When in doubt, use kana.
+- ${vocabRule}
+- Grammar and sentence patterns: comfortably readable at about ${jlptFor(wk.level)}. Vary sentence patterns; some dialogue is good.
+- Make it genuinely enjoyable: a small complete narrative with a beginning, a turn, and an ending. Light humour, a twist, or warmth is welcome. Avoid textbook blandness. Use a range of the known kanji rather than repeating the same few.
+
+Output: JSON matching the schema. Segment each sentence into tokens the way a Japanese tokenizer would (words, particles, and punctuation as separate tokens; the tokens concatenated must reproduce the sentence exactly). For every token that contains kanji, give the hiragana reading of the whole token (食べました → たべました) and two plausible wrong readings a learner might confuse it with (wrong on/kun choice, missing rendaku, wrong vowel length, a reading of a look-alike kanji). The wrong readings must be clearly wrong, not alternative valid readings. Also give a short English meaning of the token as used in the sentence (m) and two plausible wrong meanings (md) of the same kind of word (e.g. for 駅前 "in front of the station" with wrong "station staff", "ticket gate").
+
+Known kanji (${k.kanji.length}):
+${k.kanji.join('')}
+
+Known vocabulary (${k.vocab.length}):
+${k.vocab.join(' ')}`;
+}
+function pickFocus(k){
+  const missed=Object.entries(stats).filter(([c,s])=>s.wrong>0 && k.kanji.includes(c)).sort((a,b)=>b[1].wrong/b[1].asked-a[1].wrong/a[1].asked).slice(0,5).map(e=>e[0]);
+  const fresh=shuffle(k.fresh.filter(c=>!missed.includes(c))).slice(0, 10-missed.length);
+  return [...missed, ...fresh];
+}
+async function generateStory(topic, length){
+  if (!settings.apiKey) throw new Error('Add your Anthropic API key in ⚙︎ Settings.');
+  if (!wk) throw new Error('Sync WaniKani first (⚙︎ Settings).');
+  const k=knownSets(); if (k.kanji.length<20) throw new Error(`Only ${k.kanji.length} kanji at that stage. Lower the "known from" stage in Settings.`);
+  const focus=pickFocus(k);
+  const user=`Write a ${LEN[length].desc} story.${topic ? ` Theme: ${topic}.` : ' Pick any theme you like; surprise me.'}${focus.length ? ` If it fits naturally, work in some of these kanji: ${focus.join('')}.` : ''}`;
+  const body={ model:settings.model, max_tokens:LEN[length].max,
+    system:[{ type:'text', text:systemPrompt(k), cache_control:{type:'ephemeral'} }],
+    messages:[{ role:'user', content:user }],
+    output_config:{ format:{ type:'json_schema', schema:SCHEMA }, effort:'medium' } };
+  const res=await fetch('https://api.anthropic.com/v1/messages', { method:'POST',
+    headers:{ 'content-type':'application/json', 'x-api-key':settings.apiKey, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+    body:JSON.stringify(body) });
+  let msg; try{ msg=await res.json(); }catch(e){ throw new Error(`Anthropic returned ${res.status}`); }
+  if (!res.ok) throw new Error(msg.error && msg.error.message ? msg.error.message : `Anthropic error ${res.status}`);
+  if (msg.stop_reason==='refusal') throw new Error('Claude declined this request. Try a different theme.');
+  if (msg.stop_reason==='max_tokens') throw new Error('The story ran too long and was cut off. Try a shorter length.');
+  const text=(msg.content.find(b=>b.type==='text')||{}).text; if (!text) throw new Error('Empty response.');
+  let data; try{ data=JSON.parse(text); }catch(e){ throw new Error('Could not parse the story JSON.'); }
+  const known=new Set(k.kanji); const unknown=new Set();
+  const sentences=data.sentences.map(s=>({ en:s.en, np:!!s.new_paragraph,
+    tokens:s.tokens.filter(t=>t.t!=='').map(t=>{ const kj=hasKanji(t.t); if (kj) kanjiIn(t.t).forEach(c=>{ if(!known.has(c)) unknown.add(c); });
+      return { t:t.t, r:kj ? (t.r||'') : '', d:kj ? (t.d||[]) : [], m:kj ? (t.m||'') : '', md:kj ? (t.md||[]) : [] }; }) }));
+  const u=msg.usage||{}; const p=PRICE[settings.model]||[0,0,0,0];
+  const cost=((u.input_tokens||0)*p[0]+(u.output_tokens||0)*p[1]+(u.cache_read_input_tokens||0)*p[2]+(u.cache_creation_input_tokens||0)*p[3])/1e6;
+  return { id:uid(), createdAt:new Date().toISOString(), title:{jp:data.title_jp, en:data.title_en}, sentences, topic, length, model:settings.model,
+    level:wk.level, minStage:settings.minStage, unknown:[...unknown], usage:{ in:u.input_tokens||0, out:u.output_tokens||0, cacheRead:u.cache_read_input_tokens||0, cacheWrite:u.cache_creation_input_tokens||0, cost }, quiz:null };
+}
+
+/* ------------------------------------------------------------------ screens */
+let screen='home';
+function show(name){
+  screen=name;
+  for (const s of ['home','reader','settings']) $('#'+s).hidden = s!==name;
+  $('#back').hidden = name==='home';
+  $('#gear').hidden = name!=='home';
+  closeDrawer();
+  if (name==='home'){ $('#title').childNodes[0].textContent='読み物 '; $('#subtitle').textContent=''; renderHome(); }
+  if (name==='settings'){ $('#title').childNodes[0].textContent='Settings '; $('#subtitle').textContent=''; renderSettings(); }
+  window.scrollTo(0,0);
+}
+$('#back').onclick = () => show('home');
+$('#gear').onclick = () => show('settings');
+
+/* ---- home ---- */
+function renderHome(){
+  renderKnown();
+  for (const b of $('#lenseg').children) b.setAttribute('aria-pressed', String(b.dataset.v===settings.length));
+  const ul=$('#lib'); ul.innerHTML='';
+  $('#libempty').hidden = stories.length>0;
+  $('#libcount').textContent = stories.length ? `${stories.length} ${stories.length===1?'story':'stories'}` : '';
+  for (const s of stories){
+    const li=document.createElement('li');
+    const nk=new Set(s.sentences.flatMap(x=>x.tokens.flatMap(t=>kanjiIn(t.t)))).size;
+    const q=s.quiz ? `<span class="pill ${s.quiz.wrong===0?'ok':''}">quiz ${s.quiz.right}/${s.quiz.total}</span>` : '';
+    const unk=s.unknown && s.unknown.length ? `<span class="pill warn" title="kanji outside your known list">${s.unknown.length} unknown</span>` : '';
+    li.innerHTML=`<div class="jt">${esc(s.title.jp)}</div><div class="et">${esc(s.title.en)}</div>
+      <div class="meta"><span class="pill">${fmtDate(s.createdAt)}</span><span class="pill">${s.sentences.length} sent · ${nk} kanji</span>${q}${unk}</div>`;
+    li.onclick=()=>openStory(s.id);
+    ul.appendChild(li);
+  }
+}
+$('#lenseg').onclick = e => { const b=e.target.closest('button'); if(!b) return; settings.length=b.dataset.v; saveSettings(); renderHome(); };
+$('#gen').onclick = async () => {
+  const btn=$('#gen'); btn.disabled=true; $('#busy').hidden=false;
+  const t0=Date.now(); $('#busytxt').textContent='Claude is writing…';
+  const tick=setInterval(()=>{ $('#busysub').textContent=`${Math.round((Date.now()-t0)/1000)} s · ${settings.model.replace('claude-','').replace(/-/g,' ')}`; }, 500);
+  try{
+    const story=await generateStory($('#topic').value.trim(), settings.length);
+    stories.unshift(story); if (stories.length>300) stories.length=300; saveStories();
+    $('#topic').value='';
+    openStory(story.id);
+    if (story.unknown.length) toast(`Note: ${story.unknown.length} kanji outside your list (${story.unknown.join('')}), marked with a dotted line.`);
+  }catch(e){ toast(e.message||String(e), true); }
+  finally{ clearInterval(tick); btn.disabled=false; $('#busy').hidden=true; }
+};
+
+/* ---- reader ---- */
+let cur=null, mode='read', quiz=null, enAll=false, furiAll=false;
+function openStory(id){
+  cur=stories.find(s=>s.id===id); if (!cur) return;
+  mode='read'; enAll=false; furiAll=false; quiz=null;
+  show('reader');
+  $('#title').childNodes[0].textContent=cur.title.jp+' '; $('#subtitle').textContent=cur.title.en;
+  renderReader();
+}
+function setMode(m){
+  mode=m; closeDrawer();
+  for (const b of $('#modeseg').children) b.setAttribute('aria-pressed', String(b.dataset.v===m));
+  $('#readtools').hidden = m!=='read'; $('#quiztools').hidden = m!=='quiz'; $('#scorebar').hidden = m!=='quiz';
+  if (m==='quiz' && !quiz) startQuiz();
+  renderReader();
+}
+$('#modeseg').onclick = e => { const b=e.target.closest('button'); if (b) setMode(b.dataset.v); };
+$('#allfuri').onclick = () => { furiAll=!furiAll; $('#allfuri').setAttribute('aria-pressed', String(furiAll)); renderReader(); };
+$('#allen').onclick = () => { enAll=!enAll; $('#allen').setAttribute('aria-pressed', String(enAll)); closeDrawer(); renderReader(); };
+$('#fontup').onclick = () => setSize(settings.storySize+2);
+$('#fontdn').onclick = () => setSize(settings.storySize-2);
+function setSize(px){ settings.storySize=Math.max(18, Math.min(44, px)); saveSettings(); document.documentElement.style.setProperty('--story-size', settings.storySize+'px'); }
+setSize(settings.storySize);
+$('#requiz').onclick = () => { startQuiz(); renderReader(); };
+$('#kindseg').onclick = e => { const b=e.target.closest('button'); if(!b) return; settings.quizKind=b.dataset.v; saveSettings(); renderKindSeg(); startQuiz(); renderReader(); };
+function renderKindSeg(){ for (const b of $('#kindseg').children) b.setAttribute('aria-pressed', String(b.dataset.v===settings.quizKind)); }
+renderKindSeg();
+$('#quizspeak').onclick = () => { settings.quizSpeak=!settings.quizSpeak; saveSettings(); renderSpeakBtn(); if (!settings.quizSpeak && 'speechSynthesis' in window) speechSynthesis.cancel(); };
+function renderSpeakBtn(){ const b=$('#quizspeak'); b.setAttribute('aria-pressed', String(settings.quizSpeak)); b.textContent = settings.quizSpeak ? '🔊' : '🔇'; }
+renderSpeakBtn();
+
+const shownFuri=new Set();   // "si:ti" toggled on in read mode
+const NOSTART=/^[、。，．」』）〕】］！？!?…ー々ゝゞ]+$/, NOEND=/^[「『（〔【［]+$/;
+let hlSent=-1;
+function renderReader(){
+  const art=$('#story'); art.className='story'+(mode==='quiz'?' quiz':'')+(enAll&&mode==='read'?' blocks':'');
+  let html=`<h2>${rubyTitle(cur.title.jp)}<small>${esc(cur.title.en)}</small></h2>`;
+  const unknown=new Set(cur.unknown||[]);
+  let openP=false;
+  cur.sentences.forEach((s,si)=>{
+    if (si===0 || s.np){ if (openP) html+='</p>'; html+='<p>'; openP=true; }
+    html+=`<span class="sent${si===hlSent?' hl':''}" data-s="${si}">`;
+    /* Buttons are atomic for line breaking, so Japanese line-start/line-end rules don't apply across them.
+       Glue an opening bracket before, and closing punctuation after, each kanji word into a no-wrap span. */
+    const plain=ti=>`<span class="tk">${esc(s.tokens[ti].t)}</span>`;
+    const parts=[]; let ti=0;
+    while (ti<s.tokens.length){
+      const t=s.tokens[ti];
+      if (!hasKanji(t.t)){ parts.push({html:plain(ti), plain:true}); ti++; continue; }
+      const key=si+':'+ti; const unk=kanjiIn(t.t).some(c=>unknown.has(c));
+      let cls='tk kj'; if (unk) cls+=' unk';
+      if (mode==='read'){ if (furiAll || unk || shownFuri.has(key)) cls+=' show'; }
+      else { const a=quiz.answers[key]; if (a==='ok') cls+=' show ok'; else if (a==='bad') cls+=' show bad'; if (quiz.cur===key) cls+=' cur';
+        if (quiz.kind[key]==='meaning') cls+=' show mq'; }
+      let pre=''; if (parts.length && parts[parts.length-1].plain && NOEND.test(s.tokens[ti-1].t)) pre=parts.pop().html;
+      let grp=`<button class="${cls}" data-s="${si}" data-t="${ti}">${rubyHTML(t.t, t.r)}</button>`; ti++;
+      while (ti<s.tokens.length && NOSTART.test(s.tokens[ti].t)){ grp+=plain(ti); ti++; }
+      parts.push({html:`<span class="nb">${pre}${grp}</span>`});
+    }
+    html+=parts.map(p=>p.html).join('');
+    if (mode==='read') html+=`<button class="enb" data-en="${si}" aria-pressed="${si===hlSent}" aria-label="Translate sentence">英</button>`;
+    if (mode==='read' && enAll) html+=`<span class="en">${esc(s.en)}</span>`;
+    html+='</span>';
+  });
+  if (openP) html+='</p>';
+  art.innerHTML=html;
+  renderScore(); renderMeta();
+}
+function rubyTitle(t){ return esc(t); }
+$('#story').onclick = e => {
+  const enb=e.target.closest('.enb'); if (enb){ const si=+enb.dataset.en; hlSent = hlSent===si ? -1 : si; renderReader(); if (hlSent>=0) openTranslation(si); else closeDrawer(); return; }
+  const b=e.target.closest('.kj'); if (!b) return;
+  const key=b.dataset.s+':'+b.dataset.t;
+  if (mode==='read'){ if (shownFuri.has(key)) shownFuri.delete(key); else shownFuri.add(key); b.classList.toggle('show', furiAll || shownFuri.has(key) || b.classList.contains('unk')); return; }
+  if (quiz.answers[key]) return;
+  quiz.cur=key; quiz.lastKey=key; renderReader(); openChoices(key);
+};
+function openTranslation(si){
+  const s=cur.sentences[si];
+  const jp=s.tokens.map(t=>hasKanji(t.t)?rubyHTML(t.t,t.r):esc(t.t)).join('');
+  openDrawer(`<div class="handle"></div><div class="jp">${jp}</div><div class="trans">${esc(s.en)}</div>
+    <div class="foot"><button class="btn small" id="say">🔊 Listen</button><button class="btn small" id="dclose">Close</button></div>`);
+  $('#say').onclick=()=>speak(s.tokens.map(t=>t.t).join(''));
+  $('#dclose').onclick=()=>{ hlSent=-1; closeDrawer(); renderReader(); };
+}
+/* Speech: the voice list loads asynchronously in Chrome, so pick the Japanese voice once it is available and stay
+   silent (rather than let an English voice attempt kana, which comes out as a pop) if the device has none. */
+let jaVoice=null, warnedVoice=false;
+function pickVoice(){ if (!('speechSynthesis' in window)) return; const vs=speechSynthesis.getVoices();
+  jaVoice = vs.find(v=>/^ja/i.test(v.lang) && /kyoko|otoya|hattori|o-ren/i.test(v.name)) || vs.find(v=>/^ja/i.test(v.lang)) || null; }
+if ('speechSynthesis' in window){ pickVoice(); speechSynthesis.addEventListener('voiceschanged', pickVoice); }
+/* Note: Firefox on macOS adds a loud pop after every utterance (its speech engine, not this page; the same voice via
+   the say command is clean). Safari on iPad and Mac are fine. */
+function speak(text){
+  if (!('speechSynthesis' in window)) return;
+  if (!jaVoice) pickVoice();
+  if (!jaVoice){ if (!warnedVoice){ warnedVoice=true; toast('No Japanese voice installed on this device, so nothing is read aloud.'); } return; }
+  if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text); u.voice=jaVoice; u.lang=jaVoice.lang; u.rate=0.9; u.volume=1;
+  speechSynthesis.speak(u);
+}
+
+/* ---- quiz ---- */
+/* Each kanji word is a quiz target. Its question kind is 'reading' (choose the reading) or, when the word has a
+   meaning and the setting allows, 'meaning' (furigana shown, choose the English). Mix picks about half of each. */
+function startQuiz(){
+  const targets=[], kind={};
+  cur.sentences.forEach((s,si)=>s.tokens.forEach((t,ti)=>{ if (!hasKanji(t.t) || !t.r) return; const key=si+':'+ti; targets.push(key);
+    const canMean=!!t.m; kind[key] = settings.quizKind==='reading' || !canMean ? 'reading' : settings.quizKind==='meaning' ? 'meaning' : (Math.random()<0.5 ? 'meaning' : 'reading'); }));
+  quiz={ targets, kind, answers:{}, cur:null, done:false };
+  $('#quizdone').hidden=true;
+}
+function tokAt(key){ const [si,ti]=key.split(':').map(Number); return cur.sentences[si].tokens[ti]; }
+function meaningChoices(tok){
+  const seen=new Set([tok.m.toLowerCase()]); const out=[];
+  for (const d of (tok.md||[])){ if (d && !seen.has(d.toLowerCase())){ seen.add(d.toLowerCase()); out.push(d); } if (out.length===2) break; }
+  if (out.length<2){ // fall back to meanings of other words in this story
+    const pool=shuffle(cur.sentences.flatMap(s=>s.tokens.filter(t=>t.m && !seen.has(t.m.toLowerCase())).map(t=>t.m)));
+    for (const m of pool){ if (out.length===2) break; if (!seen.has(m.toLowerCase())){ seen.add(m.toLowerCase()); out.push(m); } }
+  }
+  return shuffle([tok.m, ...out]);
+}
+function openChoices(key){
+  const tok=tokAt(key); const meaning=quiz.kind[key]==='meaning';
+  const ch=meaning ? meaningChoices(tok) : choicesFor(tok);
+  const word=meaning ? rubyHTML(tok.t, tok.r).replace(/<rt>/g,'<rt style="visibility:visible">') : esc(tok.t);
+  openDrawer(`<div class="handle"></div><div class="word">${word}</div>
+    <div class="choices${meaning?' en':''}">${ch.map(c=>`<button data-c="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+    <div class="foot"><span class="muted">${meaning?'What does it mean?':'Tap the reading'}</span><button class="btn small" id="dclose">Skip</button></div>`);
+  $('#dclose').onclick=()=>{ quiz.cur=null; closeDrawer(); renderReader(); };
+  $('#drawerin').querySelectorAll('.choices button').forEach((b,i)=>{ b.dataset.n=i+1; b.onclick=()=>answer(key, b.dataset.c, b, false); });
+  if (HAS_KEYS) $('#drawerin .foot .muted').insertAdjacentHTML('beforeend', ' <span class="keys"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> choose · <kbd>space</kbd> next · <kbd>esc</kbd> skip</span>');
+  quiz.lastKey=key;
+  document.querySelector('.kj.cur')?.scrollIntoView({block:'center', behavior:'smooth'});
+}
+/* keyboard: open the next unanswered word after the last one touched, wrapping round */
+function nextWord(){
+  if (!quiz) return;
+  const i=quiz.targets.indexOf(quiz.lastKey); const order=[...quiz.targets.slice(i+1), ...quiz.targets.slice(0, i+1)];
+  const k=order.find(k=>!quiz.answers[k]); if (!k) return;
+  quiz.cur=k; renderReader(); openChoices(k);
+}
+const HAS_KEYS = matchMedia('(hover:hover) and (pointer:fine)').matches;
+document.addEventListener('keydown', e => {
+  if (screen!=='reader' || e.metaKey || e.ctrlKey || e.altKey || (e.target instanceof Element && e.target.matches('input,textarea,select'))) return;
+  const open=$('#drawer').classList.contains('open');
+  if (mode==='quiz'){
+    if (open && /^[1-3]$/.test(e.key)){ const b=$('#drawerin').querySelectorAll('.choices button')[+e.key-1]; if (b && !b.disabled){ answer(quiz.cur, b.dataset.c, b, true); } e.preventDefault(); return; }
+    if (open && e.key==='Escape'){ $('#dclose')?.click(); e.preventDefault(); return; }
+    if (!open && (e.key===' ' || e.key==='Enter' || e.key==='ArrowRight')){ nextWord(); e.preventDefault(); }
+  } else {
+    if (e.key==='Escape' && open){ hlSent=-1; closeDrawer(); renderReader(); e.preventDefault(); }
+    if (e.key==='ArrowRight' || e.key==='ArrowLeft'){
+      const n=cur.sentences.length; hlSent = hlSent<0 ? (e.key==='ArrowRight' ? 0 : n-1) : (hlSent + (e.key==='ArrowRight' ? 1 : -1) + n) % n;
+      renderReader(); openTranslation(hlSent); document.querySelector('.sent.hl')?.scrollIntoView({block:'center', behavior:'smooth'}); e.preventDefault();
+    }
+  }
+});
+function answer(key, chosen, btn, viaKey){
+  const tok=tokAt(key); const meaning=quiz.kind[key]==='meaning';
+  const right = meaning ? tok.m : tok.r;
+  const same=(a,b)=> meaning ? a.toLowerCase()===b.toLowerCase() : kataToHira(a)===kataToHira(b);
+  const ok=same(chosen, right);
+  quiz.answers[key]= ok ? 'ok' : 'bad'; quiz.cur=null;
+  if (settings.quizSpeak) speak(tok.r);   // the reading in kana, so the voice can't misread the kanji
+  for (const c of kanjiIn(tok.t)){ const s=stats[c]||(stats[c]={asked:0,wrong:0}); s.asked++; if(!ok) s.wrong++; }
+  LS.set('stats', stats);
+  $('#drawerin').querySelectorAll('.choices button').forEach(b=>{ b.disabled=true; if (same(b.dataset.c, right)) b.classList.add('ok'); else if (b===btn) b.classList.add('bad'); });
+  const w=$('#drawerin').querySelector('.word'); if (w) w.innerHTML=rubyHTML(tok.t, tok.r).replace(/<rt>/g,'<rt style="visibility:visible">') + (tok.m ? `<div class="wm">${esc(tok.m)}</div>` : '');
+  setTimeout(()=>{ closeDrawer(); renderReader(); if (!maybeFinish() && viaKey) nextWord(); }, ok ? 550 : 1300);
+}
+function renderScore(){
+  if (mode!=='quiz' || !quiz) return;
+  const n=quiz.targets.length, right=Object.values(quiz.answers).filter(a=>a==='ok').length, wrong=Object.values(quiz.answers).filter(a=>a==='bad').length;
+  $('#scoretxt').textContent=`${right+wrong}/${n} · ✓ ${right} ✗ ${wrong}`;
+  $('#trok').style.width=(100*right/n)+'%'; $('#trbad').style.width=(100*wrong/n)+'%';
+}
+function maybeFinish(){
+  const n=quiz.targets.length; const done=Object.keys(quiz.answers).length;
+  if (done<n) return false;
+  const right=Object.values(quiz.answers).filter(a=>a==='ok').length, wrong=n-right;
+  const missed=quiz.targets.filter(k=>quiz.answers[k]==='bad').map(k=>({t:tokAt(k), k:quiz.kind[k]}));
+  const nm=quiz.targets.filter(k=>quiz.kind[k]==='meaning').length;
+  cur.quiz={ right, wrong, total:n, at:new Date().toISOString() }; saveStories();
+  const box=$('#quizdone'); box.hidden=false;
+  box.innerHTML=`<div class="summary"><div class="big">${Math.round(100*right/n)}%</div><div>${right} of ${n} right (${n-nm} readings, ${nm} meanings).${wrong?` The ${wrong} you missed:`:' Perfect!'}</div>
+    ${wrong?`<div class="missed">${missed.map(({t,k})=>`<span title="${k}">${rubyHTML(t.t,t.r).replace(/<rt>/g,'<rt style="visibility:visible">')}${t.m?`<small> ${esc(t.m)}</small>`:''}</span>`).join('')}</div>`:''}
+    <div class="row"><button class="btn primary" id="again">Try again</button><button class="btn" id="toread">Back to reading</button></div></div>`;
+  $('#again').onclick=()=>{ startQuiz(); renderReader(); };
+  $('#toread').onclick=()=>setMode('read');
+  box.scrollIntoView({behavior:'smooth', block:'center'});
+  return true;
+}
+
+/* ---- meta ---- */
+function renderMeta(){
+  const s=cur; const u=s.usage||{};
+  const nk=new Set(s.sentences.flatMap(x=>x.tokens.flatMap(t=>kanjiIn(t.t))));
+  $('#storymeta').innerHTML=`<div class="kv">
+    <span>Written</span><b>${new Date(s.createdAt).toLocaleString()}</b>
+    <span>Model</span><b>${esc(s.model||'')}</b>
+    <span>Kanji used</span><b>${nk.size} distinct${s.unknown&&s.unknown.length?` · <span class="pill warn">outside your list: ${esc(s.unknown.join(' '))}</span>`:''}</b>
+    <span>Known from</span><b>${s.level ? `WaniKani level ${s.level}, SRS stage ≥ ${s.minStage}` : 'your known list at the time'}${s.bundled ? ' · bundled with the app' : ''}</b>
+    ${s.topic?`<span>Theme</span><b>${esc(s.topic)}</b>`:''}
+    <span>Cost</span><b>${u.cost!=null?`≈ ${(u.cost*100).toFixed(1)}¢ (${u.in+u.cacheRead+u.cacheWrite} in, ${u.out} out${u.cacheRead?`, ${u.cacheRead} cached`:''})`:'–'}</b>
+    </div>
+    <div class="row" style="margin-top:14px"><button class="btn small" id="del">Delete story</button></div>`;
+  $('#del').onclick=()=>{ if (!confirm('Delete this story?')) return; stories=stories.filter(x=>x.id!==s.id); saveStories();
+    if (s.bundled){ hidden.push(s.id); LS.set('hidden', hidden); } show('home'); };
+}
+
+/* ---- drawer ---- */
+function openDrawer(html){ $('#drawerin').innerHTML=html; $('#drawer').classList.add('open'); }
+function closeDrawer(){ $('#drawer').classList.remove('open'); }
+
+/* ---- settings ---- */
+function renderSettings(){
+  $('#wktoken').value=settings.wkToken; $('#apikey').value=settings.apiKey; $('#model').value=settings.model;
+  $('#minstage').value=String(settings.minStage); $('#vocabmode').value=settings.vocabMode;
+  renderSyncStat();
+  const bytes=Object.keys(localStorage).reduce((n,k)=>n+(localStorage.getItem(k)||'').length*2, 0);
+  const asked=Object.values(stats).reduce((n,s)=>n+s.asked,0), wrong=Object.values(stats).reduce((n,s)=>n+s.wrong,0);
+  $('#datastats').innerHTML=`<span>Stories</span><b>${stories.length}</b><span>Quiz answers</span><b>${asked} (${wrong} wrong, over ${Object.keys(stats).length} kanji)</b><span>Storage used</span><b>${(bytes/1024).toFixed(0)} KB</b>`;
+}
+$('#wktoken').onchange = e => { settings.wkToken=e.target.value.trim(); saveSettings(); };
+$('#apikey').onchange = e => { settings.apiKey=e.target.value.trim(); saveSettings(); };
+$('#model').onchange = e => { settings.model=e.target.value; saveSettings(); };
+$('#minstage').onchange = e => { settings.minStage=+e.target.value; saveSettings(); renderSyncStat(); };
+$('#vocabmode').onchange = e => { settings.vocabMode=e.target.value; saveSettings(); };
+document.querySelectorAll('[data-reveal]').forEach(b=>b.onclick=()=>{ const i=$('#'+b.dataset.reveal); i.type = i.type==='password' ? 'text' : 'password'; b.textContent = i.type==='password' ? 'Show' : 'Hide'; });
+$('#sync').onclick = async () => { const b=$('#sync'); b.disabled=true; try{ settings.wkToken=$('#wktoken').value.trim(); saveSettings(); await syncWK(); toast('WaniKani synced'); }catch(e){ toast(e.message||String(e), true); renderSyncStat(); } finally{ b.disabled=false; } };
+$('#export').onclick = () => { const blob=new Blob([JSON.stringify({stories, stats}, null, 1)], {type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='yomimono-stories.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 5000); };
+$('#wipe').onclick = () => { if (!confirm(`Delete all ${stories.length} stories? Your keys and WaniKani sync are kept.`)) return; stories=[]; saveStories(); renderSettings(); toast('Stories deleted'); };
+
+/* ---- boot ---- */
+if ('speechSynthesis' in window) speechSynthesis.getVoices();
+show('home');
+/* deep links: #s=<story id>, #s=<id>&quiz, #settings */
+function route(){ const p=new URLSearchParams(location.hash.slice(1)); if (p.has('settings')) return show('settings');
+  const id=p.get('s'); if (id && stories.some(s=>s.id===id)){ openStory(id); if (p.has('quiz')) setMode('quiz'); } }
+route(); window.addEventListener('hashchange', route);
+/* stories.json next to the page holds stories written outside the app (see tools/build_stories.py); add any new ones */
+(async function loadBundled(){
+  try{
+    const res=await fetch('stories.json', {cache:'no-cache'}); if (!res.ok) return;
+    const d=await res.json(); let added=0;
+    for (const s of d.stories){ if (hidden.includes(s.id) || stories.some(x=>x.id===s.id)) continue; stories.push(s); added++; }
+    if (added){ saveStories(); if (screen==='home') renderHome(); toast(`${added} new ${added===1?'story':'stories'} added to the library`); }
+  }catch(e){ /* offline or no bundle: nothing to add */ }
+})();
+if (wk && Date.now()-new Date(wk.syncedAt).getTime() > 24*3600e3 && settings.wkToken) syncWK().then(()=>toast('WaniKani re-synced')).catch(()=>{});
+</script>
+</body>
+</html>

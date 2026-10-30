@@ -1,0 +1,104 @@
+# Story source for tools/build_stories.py.
+# "# id | 日本語の題 | English title | short|medium|long" starts a story.
+# "¶" alone on a line means the next sentence starts a new paragraph.
+# A sentence line is tokens separated by spaces, then " // " and its English.
+# A token with kanji is written surface[reading|wrong1,wrong2]; kana and punctuation tokens are bare.
+
+# b01 | 駅前の小さな本屋 | The Little Bookshop by the Station | medium
+¶
+駅前[えきまえ|えきぜん,えきまい] に 小さな[ちいさな|こさな,ちさな] 本屋[ほんや|ほんおく,もとや] が あります 。 // In front of the station there is a small bookshop.
+毎朝[まいあさ|まいちょう,ごとあさ] 、 おじいさん が 七時[しちじ|ななじ,しちとき] に 店[みせ|てん,たな] を 開けます[あけます|ひらけます,かいけます] 。 // Every morning an old man opens the shop at seven.
+白い[しろい|はくい,しらい] 猫[ねこ|びょう,ねご] が いつも 古い[ふるい|こい,ふるおい] 本[ほん|もと,ぼん] の 上[うえ|じょう,うわ] で ねています 。 // A white cat always sleeps on top of the old books.
+¶
+ある 日[ひ|にち,か] 、 子ども[こども|しども,こどう] が 店[みせ|てん,たな] に 入って[はいって|いって,にゅうって] きました 。 // One day a child came into the shop.
+「 その 猫[ねこ|びょう,ねご] も 売り物[うりもの|ばいもの,うりぶつ] ですか ？ 」 と 子ども[こども|しども,こどう] は 聞きました[ききました|もんきました,きぎました] 。 // "Is that cat for sale too?" the child asked.
+おじいさん は 笑って[わらって|えって,わらいて] 、 「 いいえ 、 あれ は 店長[てんちょう|みせちょう,てんなが] です 」 と 言いました[いいました|げんいました,いました] 。 // The old man laughed and said, "No, that one is the manager."
+子ども[こども|しども,こどう] は 目[め|もく,ま] を 大きく[おおきく|だいきく,おきく] して 、 「 店長[てんちょう|みせちょう,てんなが] さん 、 この 本[ほん|もと,ぼん] は いくら ですか 」 と 猫[ねこ|びょう,ねご] に 聞きました[ききました|もんきました,きぎました] 。 // The child's eyes went wide, and they asked the cat, "Manager, how much is this book?"
+猫[ねこ|びょう,ねご] は 何も[なにも|なんも,かも] 言わないで[いわないで|げんわないで,ゆわないで] 、 本[ほん|もと,ぼん] の 上[うえ|じょう,うわ] から 下りました[おりました|したりました,げりました] 。 // Without saying anything, the cat climbed down from the books.
+¶
+おじいさん は 「 店長[てんちょう|みせちょう,てんなが] が いい と 言って[いって|げんって,ゆって] いる から 、 百円[ひゃくえん|びゃくえん,ひゃくまる] で いい よ 」 と 言いました[いいました|げんいました,いました] 。 // The old man said, "The manager says it's fine, so a hundred yen will do."
+子ども[こども|しども,こどう] は 本[ほん|もと,ぼん] を 買って[かって|ばいって,かいって] 、 毎週[まいしゅう|まいしゅ,ごとしゅう] 土曜日[どようび|つちようび,どよび] に 店[みせ|てん,たな] に 来る[くる|きる,らいる] ように なりました 。 // The child bought the book and started coming to the shop every Saturday.
+今[いま|こん,きん] では 、 猫[ねこ|びょう,ねご] は 子ども[こども|しども,こどう] の ひざ の 上[うえ|じょう,うわ] で ねています 。 // These days, the cat sleeps on the child's lap.
+
+# b02 | 雨の日の約束 | A Promise on a Rainy Day | medium
+¶
+私[わたし|わたくし,し] は 雨[あめ|う,あま] が 好き[すき|こうき,よき] では ありません 。 // I don't like rain.
+でも 、 あの 日[ひ|にち,か] の 雨[あめ|う,あま] だけ は 、 今[いま|こん,きん] でも 大切[たいせつ|だいせつ,たいきり] な 思い出[おもいで|しで,おもいしゅつ] です 。 // But the rain of that one day is still a precious memory.
+¶
+高校[こうこう|たかこう,こうきょう] 一年生[いちねんせい|ひとねんせい,いちとしせい] の 春[はる|しゅん,はり] 、 私[わたし|わたくし,し] は 駅[えき|やく,えぎ] で 電車[でんしゃ|でんくるま,てんしゃ] を 待って[まって|たいって,もって] いました 。 // In the spring of my first year of high school, I was waiting for a train at the station.
+急に[きゅうに|きゅに,そうきゅうに] 強い[つよい|きょうい,つおい] 雨[あめ|う,あま] が ふって きて 、 かさ の ない 私[わたし|わたくし,し] は こまって いました 。 // Suddenly it started raining hard, and without an umbrella I was stuck.
+その 時[とき|じ,どき] 、 知らない[しらない|ちらない,しりない] 男の子[おとこのこ|だんのこ,おとこのし] が 青い[あおい|せいい,あうい] かさ に 入れて[いれて|はいれて,にゅうれて] くれました 。 // Just then, a boy I didn't know let me under his blue umbrella.
+「 同じ[おなじ|どうじ,おなし] 電車[でんしゃ|でんくるま,てんしゃ] です よ ね 」 と 彼[かれ|ひ,かの] は 言いました[いいました|げんいました,いました] 。 // "We're on the same train, right?" he said.
+電車[でんしゃ|でんくるま,てんしゃ] の 中[なか|ちゅう,うち] で 、 私たち[わたしたち|わたくしたち,したち] は 音楽[おんがく|おとがく,おんらく] の 話[はなし|わ,はなち] を しました 。 // On the train we talked about music.
+彼[かれ|ひ,かの] は 「 来週[らいしゅう|きしゅう,らいしゅ] の 日曜日[にちようび|ひようび,にちよび] 、 雨[あめ|う,あま] が ふったら 、 また ここ で 会いましょう[あいましょう|かいましょう,えましょう] 」 と 言いました[いいました|げんいました,いました] 。 // He said, "Next Sunday, if it rains, let's meet here again."
+¶
+次[つぎ|じ,つき] の 日曜日[にちようび|ひようび,にちよび] 、 空[そら|くう,から] は 晴れて[はれて|せいれて,はられて] いました 。 // The next Sunday, the sky was clear.
+私[わたし|わたくし,し] は 少し[すこし|しょうし,すくし] 悲しく[かなしく|ひしく,かなじく] なりました 。 // I felt a little sad.
+でも 、 駅[えき|やく,えぎ] に 行く[いく|こうく,ゆく] と 、 彼[かれ|ひ,かの] が 青い[あおい|せいい,あうい] かさ を 持って[もって|じって,もちって] 立って[たって|りつって,たちって] いました 。 // But when I went to the station, there he was, holding the blue umbrella.
+「 雨[あめ|う,あま] は ふらなかった けど 、 約束[やくそく|やくたば,やくぞく] は 約束[やくそく|やくたば,やくぞく] だ から 」 // "It didn't rain, but a promise is a promise."
+それから 十年[じゅうねん|とおねん,じゅうとし] 、 私たち[わたしたち|わたくしたち,したち] は 雨[あめ|う,あま] の 日[ひ|にち,か] も 晴れ[はれ|せい,はら] の 日[ひ|にち,か] も 、 いっしょに います 。 // Ten years on, we are together, rain or shine.
+
+# b03 | 温泉旅館の夜 | A Night at the Hot-Spring Inn | medium
+¶
+去年[きょねん|さくねん,きょとし] の 秋[あき|しゅう,あぎ] 、 父[ちち|ふ,とう] と 二人[ふたり|にじん,ふたにん] で 山[やま|さん,やめ] の 温泉[おんせん|おんいずみ,うんせん] に 行きました[いきました|こうきました,ゆきました] 。 // Last autumn, my father and I went to a hot spring in the mountains.
+旅館[りょかん|たびかん,りょうかん] は 古く[ふるく|こく,ふるおく] て 、 お客[おきゃく|おかく,おきゃ] は 私たち[わたしたち|わたくしたち,したち] だけ でした 。 // The inn was old, and we were the only guests.
+夕食[ゆうしょく|ゆうた,せきしょく] の 後[あと|ご,のち] 、 父[ちち|ふ,とう] は すぐ に ねて しまいました 。 // After dinner, my father fell asleep right away.
+¶
+夜中[よなか|やちゅう,よるなか] の 二時[にじ|ふたじ,にとき] 、 私[わたし|わたくし,し] は 音[おと|おん,ね] で 目[め|もく,ま] が さめました 。 // I woke at two in the morning to a sound.
+だれか が 、 ろうか を 歩いて[あるいて|ほいて,あゆいて] います 。 // Someone was walking down the corridor.
+足音[あしおと|そくおん,あしね] は 、 ゆっくり 、 私[わたし|わたくし,し] の 部屋[へや|ぶや,へおく] に 近づいて[ちかづいて|きんづいて,ちかついて] きます 。 // The footsteps were slowly coming closer to my room.
+こわくて 、 声[こえ|せい,ごえ] も 出ません[でません|しゅつません,だません] 。 // I was so scared I couldn't make a sound.
+戸[と|こ,ど] が 、 少し[すこし|しょうし,すくし] 開きました[あきました|ひらきました,かいきました] 。 // The door slid open a little.
+¶
+白い[しろい|はくい,しらい] 何か[なにか|なんか,かか] が 入って[はいって|いって,にゅうって] きて 、 私[わたし|わたくし,し] の 顔[かお|がん,かほ] を なめました 。 // Something white came in and licked my face.
+電気[でんき|てんき,でんぎ] を つける と 、 それ は 旅館[りょかん|たびかん,りょうかん] の 大きな[おおきな|だいきな,おきな] 犬[いぬ|けん,いね] でした 。 // When I turned on the light, it was the inn's big dog.
+次の日[つぎのひ|じのひ,つぎのにち] の 朝[あさ|ちょう,あざ] 、 女[おんな|じょ,おな] の 人[ひと|にん,じん] が 「 うち の 犬[いぬ|けん,いね] は お客[おきゃく|おかく,おきゃ] さん が 大好き[だいすき|おおすき,だいこう] なんです 。 ごめんなさい ね 」 と 言いました[いいました|げんいました,いました] 。 // The next morning the landlady said, "Our dog just loves guests. Sorry about that."
+父[ちち|ふ,とう] は 「 何も[なにも|なんも,かも] 聞こえなかった[きこえなかった|もんこえなかった,きごえなかった] よ 」 と 言って[いって|げんって,ゆって] 、 温泉[おんせん|おんいずみ,うんせん] の たまご を 食べました[たべました|しょくべました,くべました] 。 // "I didn't hear a thing," said my father, and ate his hot-spring egg.
+
+# b04 | 新しい会社の一日目 | First Day at the New Company | medium
+¶
+今日[きょう|こんにち,いまひ] は 新しい[あたらしい|しんしい,あらたしい] 会社[かいしゃ|かいしゃく,あいしゃ] の 一日目[いちにちめ|ついたちめ,いちひめ] です 。 // Today is my first day at a new company.
+僕[ぼく|ばく,ぼう] は 六時[ろくじ|むじ,ろくとき] に 起きて[おきて|きて,おこきて] 、 新しい[あたらしい|しんしい,あらたしい] 服[ふく|ぶく,ふぐ] を 着ました[きました|ちゃくました,つきました] 。 // I got up at six and put on new clothes.
+駅[えき|やく,えぎ] まで 走って[はしって|そうって,はして] 、 電車[でんしゃ|でんくるま,てんしゃ] に 乗りました[のりました|じょうりました,のぼりました] 。 // I ran to the station and got on the train.
+¶
+会社[かいしゃ|かいしゃく,あいしゃ] に 着く[つく|ちゃくく,きく] と 、 部長[ぶちょう|ぶなが,ほうちょう] が 「 君[きみ|くん,ぎみ] が 新しい[あたらしい|しんしい,あらたしい] 人[ひと|にん,じん] だ ね 。 まず 、 コーヒー を 」 と 言いました[いいました|げんいました,いました] 。 // When I arrived, the department head said, "You're the new one. First, coffee."
+僕[ぼく|ばく,ぼう] は 急いで[いそいで|きゅういで,いそぎで] 十人分[じゅうにんぶん|じゅうじんぶん,とおにんぶん] の コーヒー を 作りました[つくりました|さくりました,つくいました] 。 // I hurried to make coffee for ten people.
+でも 、 部長[ぶちょう|ぶなが,ほうちょう] は 「 ちがう 、 ちがう 。 君[きみ|くん,ぎみ] の 分[ぶん|ふん,わ] だ よ 。 まず 休んで[やすんで|きゅうんで,やすで] 」 と 笑いました[わらいました|えいました,わらわいました] 。 // But he laughed: "No, no. It was for you. First, take a break."
+¶
+午前中[ごぜんちゅう|ごぜんなか,うまぜんちゅう] 、 僕[ぼく|ばく,ぼう] は パソコン の 使い方[つかいかた|しかいかた,つかいほう] を 習いました[ならいました|しゅういました,なれいました] 。 // In the morning I learnt how to use the computer.
+昼[ひる|ちゅう,ひり] は 同じ[おなじ|どうじ,おなし] 部[ぶ|べ,ぶう] の 人たち[ひとたち|にんたち,じんたち] と 、 近く[ちかく|きんく,ちかぐ] の 店[みせ|てん,たな] で 魚[さかな|ぎょ,さかや] 定食[ていしょく|さだしょく,ていた] を 食べました[たべました|しょくべました,くべました] 。 // At lunch I had the fish set meal at a nearby place with the people from my department.
+午後[ごご|うまご,ごあと] は 、 大切[たいせつ|だいせつ,たいきり] な 話[はなし|わ,はなち] を 聞きました[ききました|もんきました,きぎました] 。 // In the afternoon I listened to an important talk.
+よく 分かりません[わかりません|ぶんかりません,わけりません] でした が 、 みんな と 同じ[おなじ|どうじ,おなし] 時[とき|じ,どき] に うなずきました 。 // I didn't really understand, but I nodded whenever everyone else did.
+¶
+五時[ごじ|いつじ,ごとき] に 、 部長[ぶちょう|ぶなが,ほうちょう] が 「 今日[きょう|こんにち,いまひ] は よく がんばった ね 。 明日[あした|みょうにち,あけひ] も 、 コーヒー は 自分[じぶん|しぶん,じふん] の 分[ぶん|ふん,わ] だけ で いい よ 」 と 言いました[いいました|げんいました,いました] 。 // At five, the boss said, "Good work today. Tomorrow, again, just make coffee for yourself."
+僕[ぼく|ばく,ぼう] は 、 この 会社[かいしゃ|かいしゃく,あいしゃ] が 好き[すき|こうき,よき] に なり そう です 。 // I think I'm going to like this company.
+
+# b05 | おじいさんの古い時計 | Grandfather's Old Clock | long
+¶
+僕[ぼく|ばく,ぼう] の おじいさん は 、 町[まち|ちょう,まつ] で 一番[いちばん|ひとばん,いちつがい] 古い[ふるい|こい,ふるおい] 家[いえ|か,うち] に 住んで[すんで|じゅうんで,すで] いました 。 // My grandfather lived in the oldest house in town.
+家[いえ|か,うち] の 中[なか|ちゅう,うち] に は 、 大きな[おおきな|だいきな,おきな] 時計[とけい|じけい,ときはかり] が ありました 。 // Inside the house there was a big clock.
+その 時計[とけい|じけい,ときはかり] は 、 おじいさん が わかい 時[とき|じ,どき] に 、 おばあさん と 買った[かった|ばいった,かいった] もの です 。 // Grandfather and Grandmother bought it when they were young.
+¶
+時計[とけい|じけい,ときはかり] は 、 毎日[まいにち|まいひ,ごとにち] 五分[ごふん|ごぶん,いつふん] おくれました 。 // Every day the clock ran five minutes slow.
+「 直した[なおした|ちょくした,なおいた] 方[ほう|かた,ぼう] が いい よ 」 と 僕[ぼく|ばく,ぼう] が 言う[いう|げんう,ゆう] と 、 おじいさん は 首[くび|しゅ,くひ] を 横[よこ|おう,よご] に ふりました 。 // "You should get it fixed," I said, but Grandfather shook his head.
+「 この 時計[とけい|じけい,ときはかり] は 、 おばあさん と 同じ[おなじ|どうじ,おなし] で 、 少し[すこし|しょうし,すくし] ゆっくり なんだ 。 それ で いい 」 // "This clock is like your grandmother, a bit slow. That's fine as it is."
+おばあさん は 、 僕[ぼく|ばく,ぼう] が 生まれる[うまれる|せいまれる,いまれる] 前[まえ|ぜん,まい] に 死にました[しにました|しんにました,しぬました] 。 // Grandmother died before I was born.
+¶
+去年[きょねん|さくねん,きょとし] の 冬[ふゆ|とう,ふよ] 、 おじいさん も 、 いなく なりました 。 // Last winter, Grandfather was gone too.
+時計[とけい|じけい,ときはかり] は 今[いま|こん,きん] 、 僕[ぼく|ばく,ぼう] の 部屋[へや|ぶや,へおく] に あります 。 // The clock is now in my room.
+毎日[まいにち|まいひ,ごとにち] 五分[ごふん|ごぶん,いつふん] おくれる ので 、 僕[ぼく|ばく,ぼう] は 時々[ときどき|じじ,ときとき] 電車[でんしゃ|でんくるま,てんしゃ] に 間に合いません[まにあいません|かんにあいません,まにごうません] 。 // It still runs five minutes slow every day, so sometimes I miss my train.
+でも 、 直す[なおす|ちょくす,なおる] つもり は ありません 。 // But I have no intention of fixing it.
+時計[とけい|じけい,ときはかり] の 音[おと|おん,ね] を 聞く[きく|もんく,きぐ] と 、 おじいさん の 声[こえ|せい,ごえ] が 聞こえる[きこえる|もんこえる,きごえる] 気[き|け,ぎ] が する から です 。 // Because when I hear the clock, I feel I can hear Grandfather's voice.
+「 それ で いい 」 // "That's fine as it is."
+
+# b06 | 春の雪 | Spring Snow | short
+¶
+三月[さんがつ|みつき,さんげつ] の 終わり[おわり|しゅうわり,おわい] に 、 雪[ゆき|せつ,ゆぎ] が ふりました 。 // At the end of March, it snowed.
+花[はな|か,はね] が さいた ばかり の 木[き|もく,ぎ] の 上[うえ|じょう,うわ] に 、 白い[しろい|はくい,しらい] 雪[ゆき|せつ,ゆぎ] が つもりました 。 // White snow settled on the trees that had only just blossomed.
+妹[いもうと|まい,いもと] は 「 春[はる|しゅん,はり] なのに 、 なんで ？ 」 と 外[そと|がい,ほか] を 見ながら[みながら|けんながら,みるながら] 言いました[いいました|げんいました,いました] 。 // "It's spring, so why?" my little sister said, looking outside.
+母[はは|ぼ,はわ] は 「 冬[ふゆ|とう,ふよ] が 、 さよなら を 言い[いい|げんい,ゆい] に 来た[きた|らいた,くた] の よ 」 と 答えました[こたえました|とうえました,こたいました] 。 // "Winter came to say goodbye," Mum answered.
+¶
+妹[いもうと|まい,いもと] は 少し[すこし|しょうし,すくし] 考えて[かんがえて|こうえて,かんかえて] 、 外[そと|がい,ほか] に 出ました[でました|しゅつました,だました] 。 // My sister thought for a moment, then went outside.
+そして 、 小さな[ちいさな|こさな,ちさな] 雪[ゆき|せつ,ゆぎ] だるま を 作って[つくって|さくって,つくいて] 、 花[はな|か,はね] を 一つ[ひとつ|いちつ,ひとづ] のせました 。 // And she made a tiny snowman and put a single blossom on it.
+「 冬[ふゆ|とう,ふよ] さん 、 春[はる|しゅん,はり] を 持って[もって|じって,もちって] 帰って[かえって|きって,かえりって] ね 」 // "Winter, take some spring home with you."
+次の日[つぎのひ|じのひ,つぎのにち] 、 雪[ゆき|せつ,ゆぎ] は 消えて[きえて|しょうえて,けえて] 、 花[はな|か,はね] だけ が 地面[じめん|ちめん,じおもて] に 残って[のこって|ざんって,のごって] いました 。 // The next day the snow had melted, and only the blossom was left on the ground.

@@ -1,0 +1,184 @@
+# Meanings for the kanji words in tools/stories_src.txt, used by tools/build_stories.py for the meaning quiz.
+# surface <TAB> meaning as used in the story <TAB> wrong meaning 1 ; wrong meaning 2
+駅前	in front of the station	station staff ; ticket gate
+小さな	small	cute ; few
+本屋	bookshop	library ; publisher
+毎朝	every morning	this morning ; early morning
+七時	seven o'clock	one o'clock ; seven hours
+店	shop	shelf ; counter
+開けます	opens	closes ; cleans
+白い	white	black ; pale
+猫	cat	dog ; rabbit
+古い	old	new ; dusty
+本	book	notebook ; magazine
+上	on top	underneath ; inside
+日	day	sun ; week
+子ども	child	grandchild ; student
+入って	came in	went out ; sat down
+売り物	something for sale	a gift ; a sample
+聞きました	asked	answered ; said
+笑って	laughing	crying ; shouting
+店長	shop manager	shop owner ; regular customer
+言いました	said	thought ; wrote
+目	eyes	mouth ; ears
+大きく	wide (big)	narrow ; bright
+何も	nothing (at all)	something ; everything
+言わないで	without saying	without hearing ; without looking
+下りました	got down	went up ; ran away
+言って	saying	asking ; agreeing
+百円	a hundred yen	a thousand yen ; ten yen
+買って	bought	borrowed ; sold
+毎週	every week	every month ; this week
+土曜日	Saturday	Sunday ; Thursday
+来る	to come	to go ; to return
+今	now	then ; today
+私	I	you ; we
+雨	rain	cloud ; snow
+好き	like	dislike ; want
+大切	precious	big ; sad
+思い出	memory	wish ; dream
+高校	high school	university ; junior high
+一年生	first-year student	second-year student ; graduate
+春	spring	summer ; autumn
+駅	station	platform ; bus stop
+電車	train	bus ; tram
+待って	waiting	looking ; standing
+急に	suddenly	slowly ; finally
+強い	strong	weak ; cold
+時	when (time)	place ; day
+知らない	unknown (I don't know)	famous ; friendly
+男の子	boy	girl ; young man
+青い	blue	red ; green
+入れて	let (me) in	pushed (me) out ; lent (me)
+同じ	same	different ; next
+彼	he	she ; they
+中	inside	outside ; front
+私たち	we	they ; you (plural)
+音楽	music	movies ; sport
+話	talk (conversation)	song ; story (book)
+来週	next week	last week ; this week
+日曜日	Sunday	Saturday ; Monday
+会いましょう	let's meet	let's talk ; let's wait
+次	next	previous ; first
+空	sky	sea ; air
+晴れて	clear (weather)	cloudy ; raining
+少し	a little	very ; quite
+悲しく	sad	happy ; angry
+行く	to go	to come ; to arrive
+持って	holding	carrying on the back ; opening
+立って	standing	sitting ; walking
+約束	promise	plan ; date
+十年	ten years	one year ; ten months
+晴れ	fine weather	cloudy weather ; cold weather
+去年	last year	this year ; next year
+秋	autumn	spring ; winter
+父	father	mother ; grandfather
+二人	the two of us	alone ; everyone
+山	mountain	river ; forest
+温泉	hot spring	lake ; bath house
+行きました	went	came ; stayed
+旅館	Japanese inn	hotel ; shrine
+古く	old	new ; big
+お客	guests	staff ; owners
+夕食	dinner	breakfast ; lunch
+後	after	before ; during
+夜中	the middle of the night	the evening ; dawn
+二時	two o'clock	twelve o'clock ; two hours
+音	sound	light ; smell
+歩いて	walking	running ; standing
+足音	footsteps	voices ; knocking
+部屋	room	door ; hallway
+近づいて	coming closer	going away ; stopping
+声	voice	breath ; tears
+出ません	doesn't come out	doesn't stop ; doesn't enter
+戸	door	window ; curtain
+開きました	opened	closed ; broke
+何か	something	someone ; nothing
+顔	face	hand ; hair
+電気	the light	the TV ; the heater
+大きな	big	small ; old
+犬	dog	cat ; fox
+次の日	the next day	that day ; the day before
+朝	morning	evening ; noon
+女	woman	man ; girl
+人	person	child ; guest
+大好き	love (like a lot)	hate ; fear
+聞こえなかった	couldn't hear	couldn't see ; didn't ask
+食べました	ate	drank ; made
+今日	today	tomorrow ; yesterday
+新しい	new	old ; famous
+会社	company	school ; factory
+一日目	first day	one day ; the day before
+僕	I (male)	you ; he
+六時	six o'clock	nine o'clock ; six hours
+起きて	got up	went to sleep ; woke someone
+服	clothes	shoes ; bag
+着ました	put on (wore)	took off ; washed
+走って	ran	walked ; hurried by bike
+乗りました	got on	got off ; waited for
+着く	arrive	leave ; return
+部長	department head	president ; colleague
+君	you	I ; he
+急いで	in a hurry	slowly ; carefully
+十人分	enough for ten people	ten cups ; for ten minutes
+作りました	made	bought ; drank
+分	share (portion)	minute ; part of a company
+休んで	take a break	sit down ; go home
+笑いました	laughed	shouted ; sighed
+午前中	during the morning	in the afternoon ; all day
+使い方	how to use	how to fix ; how to buy
+習いました	learnt	taught ; practised
+昼	lunchtime (noon)	evening ; morning
+部	department	company ; team
+人たち	people	friends ; bosses
+近く	nearby	far away ; opposite
+魚	fish	meat ; vegetables
+定食	set meal	dessert ; drink
+午後	the afternoon	the morning ; the evening
+分かりません	don't understand	don't like ; don't know (a person)
+五時	five o'clock	four o'clock ; five hours
+明日	tomorrow	today ; yesterday
+自分	oneself	everyone ; the boss
+町	town	village ; city
+一番	the most	the first ; number two
+家	house	shop ; garden
+住んで	living	working ; staying temporarily
+時計	clock	watch strap ; calendar
+買った	bought	received ; made
+毎日	every day	every week ; all day
+五分	five minutes	five o'clock ; fifty minutes
+直した	fixed	sold ; moved
+方	the better choice (it would be better to)	direction ; person (polite)
+言う	to say	to hear ; to think
+首	head (neck)	hand ; shoulder
+横	sideways	up and down ; forward
+生まれる	to be born	to grow up ; to die
+前	before	after ; during
+死にました	died	moved away ; got sick
+冬	winter	autumn ; summer
+時々	sometimes	always ; never
+間に合いません	don't make it in time	don't fit ; don't understand
+直す	to fix	to sell ; to replace
+聞く	to hear	to see ; to touch
+聞こえる	can hear	can see ; can remember
+気	feeling	sound ; air
+三月	March	January ; third day
+終わり	end	beginning ; middle
+雪	snow	rain ; ice
+花	blossom (flower)	leaf ; branch
+木	tree	grass ; stone
+妹	younger sister	older sister ; younger brother
+外	outside	inside ; the garden
+見ながら	while looking	while listening ; while pointing
+母	mother	father ; grandmother
+言い	to say	to meet ; to wave
+来た	came	went ; left
+答えました	answered	asked ; laughed
+考えて	thought	cried ; waited
+出ました	went out	came in ; stayed
+作って	made	found ; broke
+一つ	one	two ; many
+帰って	go home	come back ; carry
+消えて	disappeared	piled up ; froze
+地面	the ground	the roof ; the road
+残って	remained	fell ; grew

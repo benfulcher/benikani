@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#f6f1e6"/>
+  <rect x="96" y="72" width="320" height="368" rx="22" fill="#fffdf7" stroke="#e2d9c6" stroke-width="6"/>
+  <text x="256" y="330" font-size="236" text-anchor="middle" fill="#2b2621" font-family="Hiragino Mincho ProN, YuMincho, serif">読</text>
+  <text x="256" y="135" font-size="54" text-anchor="middle" fill="#b23a2a" font-family="Hiragino Sans, Hiragino Kaku Gothic ProN, sans-serif">よ</text>
+</svg>
