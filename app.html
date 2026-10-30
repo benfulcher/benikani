@@ -115,8 +115,9 @@ kbd{font-family:var(--f-ui);font-size:11px;font-weight:700;padding:1px 6px;borde
   .choices button::before{content:attr(data-n);position:absolute;top:6px;left:8px;font-family:var(--f-ui);font-size:11px;font-weight:700;color:var(--ink-2);
     background:var(--card);border:1px solid var(--line);border-radius:5px;padding:0 5px;line-height:16px}
 }
-.enb{display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-ui);font-size:12px;font-weight:700;
-  width:1.5em;height:1.5em;border-radius:6px;background:var(--paper-2);color:var(--ink-2);vertical-align:middle;margin:0 .15em 0 .1em;line-height:1}
+.enb{display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-ui);font-size:14px;font-weight:700;
+  width:1.8em;height:1.8em;border-radius:7px;background:var(--card);color:var(--accent);border:1.5px solid var(--accent);
+  vertical-align:middle;margin:0 .2em 0 .15em;line-height:1}
 .enb[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .en{font-family:var(--f-ui);font-size:16px;line-height:1.5;color:var(--ink-2);text-align:left;margin:2px 0 10px;display:block}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0 18px}
@@ -592,7 +593,7 @@ function renderReader(){
       parts.push({html:`<span class="nb">${pre}${grp}</span>`});
     }
     html+=parts.map(p=>p.html).join('');
-    if (mode==='read') html+=`<button class="enb" data-en="${si}" aria-pressed="${si===hlSent}" aria-label="Translate sentence">英</button>`;
+    html+=`<button class="enb" data-en="${si}" aria-pressed="${si===hlSent}" aria-label="Translate sentence">英</button>`;
     if (mode==='read' && enAll) html+=`<span class="en">${esc(s.en)}</span>`;
     html+='</span>';
   });
@@ -602,7 +603,7 @@ function renderReader(){
 }
 function rubyTitle(t){ return esc(t); }
 $('#story').onclick = e => {
-  const enb=e.target.closest('.enb'); if (enb){ const si=+enb.dataset.en; hlSent = hlSent===si ? -1 : si; renderReader(); if (hlSent>=0) openTranslation(si); else closeDrawer(); return; }
+  const enb=e.target.closest('.enb'); if (enb){ const si=+enb.dataset.en; hlSent = hlSent===si ? -1 : si; if (quiz) quiz.cur=null; renderReader(); if (hlSent>=0) openTranslation(si); else closeDrawer(); return; }
   const b=e.target.closest('.kj'); if (!b) return;
   const key=b.dataset.s+':'+b.dataset.t;
   if (mode==='read'){ if (shownFuri.has(key)) shownFuri.delete(key); else shownFuri.add(key); b.classList.toggle('show', furiAll || shownFuri.has(key) || b.classList.contains('unk')); return; }
